@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evolution Remote Phones</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0d0d0d;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      background: #1a1a2e;
+      border: 2px solid #3264c8;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      color: #888;
+      font-size: 1rem;
+      margin-bottom: 48px;
+    }
+
+    .download-btn {
+      display: inline-block;
+      background: #3264c8;
+      color: #ffffff;
+      font-size: 1.15rem;
+      font-weight: 600;
+      padding: 18px 48px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      margin-bottom: 16px;
+    }
+
+    .download-btn:hover {
+      background: #4a7ad4;
+      transform: translateY(-2px);
+    }
+
+    .download-btn:active {
+      transform: translateY(0);
+    }
+
+    .version-info {
+      color: #555;
+      font-size: 0.85rem;
+      margin-bottom: 48px;
+    }
+
+    .version-info span {
+      color: #3264c8;
+    }
+
+    .requirements {
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 24px;
+      text-align: left;
+      margin-bottom: 32px;
+    }
+
+    .requirements h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #555;
+      margin-bottom: 12px;
+    }
+
+    .requirements ul {
+      list-style: none;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    .requirements ul li {
+      padding: 4px 0;
+    }
+
+    .requirements ul li::before {
+      content: "→ ";
+      color: #3264c8;
+    }
+
+    .footer {
+      color: #333;
+      font-size: 0.8rem;
+    }
+
+    .footer a {
+      color: #444;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="logo">📱</div>
+
+    <h1>Evolution Remote Phones</h1>
+    <p class="tagline">Manage your Android and iPhone farm from any remote desktop</p>
+
+    <a class="download-btn" id="download-btn" href="#" onclick="getLatestRelease(event)">
+      ⬇ Download for Windows
+    </a>
+
+    <p class="version-info">
+      Latest version: <span id="version-label">checking...</span> &nbsp;·&nbsp; Windows 10 / 11
+    </p>
+
+    <div class="requirements">
+      <h3>Requirements</h3>
+      <ul>
+        <li>Windows 10 or Windows 11 (64-bit)</li>
+        <li>Admin rights to install</li>
+        <li>iMouse XP running on your local network (for iPhone support)</li>
+        <li>ADB platform tools (for Android support)</li>
+        <li>Internet connection for licence verification</li>
+      </ul>
+    </div>
+
+    <p class="footer">
+      Evolution &nbsp;·&nbsp;
+      <a href="https://t.me/Evolution_Thomas">@Evolution_Thomas</a>
+    </p>
+
+  </div>
+
+  <script>
+    const REPO = "thomasevolutionagy/evolution-remote-phones";
+
+    async function getLatestRelease(e) {
+      e.preventDefault();
+      const btn = document.getElementById("download-btn");
+      btn.textContent = "Fetching download link...";
+      try {
+        const res  = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+        const data = await res.json();
+        const asset = (data.assets || []).find(a => a.name.toLowerCase().endsWith("_setup.exe") || a.name.toLowerCase().endsWith("setup.exe"));
+        if (asset) {
+          window.location.href = asset.browser_download_url;
+          btn.textContent = "⬇ Download for Windows";
+          document.getElementById("version-label").textContent = "v" + data.tag_name.replace(/^v/, "");
+        } else {
+          btn.textContent = "No release found — check back soon";
+        }
+      } catch (err) {
+        btn.textContent = "⬇ Download for Windows";
+        alert("Could not fetch release. Please try again.");
+      }
+    }
+
+    // Load version on page load
+    async function loadVersion() {
+      try {
+        const res  = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+        const data = await res.json();
+        if (data.tag_name) {
+          document.getElementById("version-label").textContent = "v" + data.tag_name.replace(/^v/, "");
+          document.getElementById("download-btn").textContent = "⬇ Download for Windows";
+        }
+      } catch {
+        document.getElementById("version-label").textContent = "unavailable";
+      }
+    }
+    loadVersion();
+  </script>
+</body>
+</html>
